@@ -1,0 +1,104 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
+
+<!--Events Templates-->
+<Frame name="CryslashEventsTrackerTemplate" virtual="true">
+   <Size x="100" y="100" />
+   <Layers>
+      <Layer level="BACKGROUND">
+         <Texture parentkey="eventbg" alpha="1" alphaMode="BLEND" atlas="TalkingHeads-TextBackground" useAtlasSize="true">
+            <Size x="100" y="100"/>
+         </Texture>
+      </Layer>
+      <Layer level="OVERLAY">
+         <Texture name="$parentIcon" parentKey="icon" >
+            <Size x="42" y="42"/>
+            <Anchors>
+               <Anchor point="TOP" x="0" y="-15" />
+            </Anchors>
+            <Animations>
+			      <AnimationGroup parentKey="Anim" looping="BOUNCE">
+				      <Alpha childKey="flash" fromAlpha="0.4" toAlpha="1" duration=".5" smoothing="IN"/>
+				      <Scripts>
+				         <OnPlay>
+					         self.loopCount = 12;
+				         </OnPlay>
+					      <OnLoop>
+					         self.loopCount = self.loopCount - 1;
+					         if self.loopCount == 0 then
+						      self:Stop();
+					         end
+				         </OnLoop>
+				      </Scripts>
+			      </AnimationGroup>
+		      </Animations>
+         </Texture>
+         <FontString parentKey="timer" inherits="GameFontNormalLarge" justifyH="CENTER">
+				<Anchors>
+					<Anchor point="TOP" relativeKey="$parent" relativePoint="BOTTOM" x="0" y="35" />
+				</Anchors>
+				<Color r=".9" g=".9" b=".9"/>
+			</FontString>
+      </Layer>
+   </Layers>
+<Scripts>
+   <OnEnter>
+      <!-- print("mouse has entered", self:GetName()) -->
+      <!-- ShowEventTooltip(self.tooltipTitle, self.isEventActive) -->
+   </OnEnter>
+</Scripts>
+</Frame>
+
+<!-- Main Frame-->
+<Frame name="CEventsTracker" parent="UIParent" hidden="true">
+   <Size x="620" y="480"/>
+   <Anchors>
+      <Anchor point="CENTER" relativePoint="CENTER" relativeTo="UIParent" />
+   </Anchors>
+   <Layers>
+      <Layer level="BACKGROUND">
+         <Texture parentkey="Background" alpha="0.9" alphaMode="BLEND" atlas="TalkingHeads-TextBackground" useAtlasSize="true"/> <!--TalkingHeads-TextBackground ChallengeMode-guild-background-->>
+      </Layer>
+      <Layer level="OVERLAY">
+         <FontString name="$parent_Title" parentkey="title" inherits="GameFontNormalLarge" Text="CrySlash - Events Tracker">
+            <Anchors>
+               <Anchor point = "TOP">
+                  <Offset x="0" y="-50" />
+               </Anchor>
+            </Anchors>
+         </FontString>
+      </Layer>
+   </Layers>   
+      <Frames>
+         <Button name="$parent_Close" parentkey="Close" mixin="HelpTipCloseButtonMixin" > <!-- inherits="UIPanelCloseButton" mixin="HelpTipCloseButtonMixin"-->
+         <Size x="18" y="18"/>
+         <Anchors>
+            <Anchor point="TOPRIGHT" x="-20" y="-45"/>
+         </Anchors>
+         <Layers>
+				<Layer level="ARTWORK">
+					<Texture parentKey="Texture">
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+					</Texture>
+				</Layer>
+			</Layers>
+         <Scripts>
+            <OnLoad method="OnLoad"/>
+				<OnClick>
+				   <!-- self:GetParent():Hide(); -->
+               HideUIPanel(CEventsTracker)
+					<!--self:GetParent():GetParent().SetupButton:SetButtonState("NORMAL", false);-->
+				</OnClick>
+			</Scripts>
+         </Button>
+      </Frames>
+      <Scripts>
+         <OnLoad function="CEventsTrack_Onload" />
+      </Scripts>
+</Frame>
+
+</Ui>
+
+
+<!--/Ui-->
