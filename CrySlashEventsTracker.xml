@@ -95,6 +95,7 @@
       </Frames>
       <Scripts>
          <OnLoad function="CEventsTrack_Onload" />
+         <OnEvent function="CEventsTracker_OnEvent" />
       </Scripts>
 </Frame>
 
