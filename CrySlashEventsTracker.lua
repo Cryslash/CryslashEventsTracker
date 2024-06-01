@@ -13,12 +13,7 @@ end
 local events = {
     [1] = { name = L["Community feast"],
         icon = "MajorFactions_MapIcons_Tuskarr64",
-        regionOffset = {
-            [1] = 52,	-- us
-            [2] = 52,	-- kr
-            [3] = 52,	-- eu
-            [4] = 52,	-- tw
-            [5] = 52,},	-- ch	
+        regionOffset = {[1] = 52, [2] = 52, [3] = 52, [4] = 52, [5] = 52,},	-- us -- kr -- eu -- tw -- ch	
         duration = 900,
         interval = 5400,
         questIDs = {70893},
@@ -26,12 +21,7 @@ local events = {
     },
     [2] = {name = L["Researchers under fire"],
         icon = "MajorFactions_MapIcons_Niffen64",
-        regionOffset = {
-            [1] = 1800,
-            [2] = 1800,
-            [3] = 1800,
-            [4] = 1800,
-            [5] = 1800,},
+        regionOffset = {[1] = 1800, [2] = 1800, [3] = 1800, [4] = 1800, [5] = 1800,},
         duration = 1500,
         interval = 3600,
         questIDs = {75627, 75628, 75629, 75630},
@@ -39,12 +29,7 @@ local events = {
     },
     [3] = {name = L["Dragonbane Keep"],
         icon = "MajorFactions_MapIcons_Expedition64",
-        regionOffset = {
-            [1] = 100,
-			[2] = 100,
-			[3] = 100,
-			[4] = 100,
-			[5] = 100,},
+        regionOffset = {[1] = 100, [2] = 100, [3] = 100, [4] = 100, [5] = 100,},
         duration = 3600,
         interval = 7200,
         questIDs = {70866},
@@ -52,24 +37,14 @@ local events = {
     },
     [4] = {name = L["Time rift"],
         icon = "interface/targetingframe/unitframeicons.blp",
-        regionOffset = {
-            [1] = 20,
-            [2] = 20,
-            [3] = 20,
-            [4] = 20,
-            [5] = 20,},
+        regionOffset = {[1] = 20, [2] = 20, [3] = 20, [4] = 20, [5] = 20,},
         duration = 900,
         interval = 3600,
         questIDs = {77836},
         gps = {2025, 51, 57}},
     [5] = {name = L["Dreamsurge"],
         icon = "dreamsurge_hub-icon",
-        regionOffset = {
-            [1] = 19,
-            [2] = 19,
-            [3] = 19,
-            [4] = 19,
-            [5] = 19,},
+        regionOffset = {[1] = 19, [2] = 19, [3] = 19, [4] = 19, [5] = 19,},
         duration = 1800,
         interval = 1800,
         questIDs = {77251},
@@ -78,12 +53,7 @@ local events = {
     },
     [6] = {name = L["Storm's Fury"],
         icon = "ElementalStorm-Boss-Water",
-        regionOffset = {
-            [1] = 1670338860 + 3600,
-            [2] = 1670698860,
-            [3] = 1674763260,
-            [4] = 1670698860,
-            [5] = 1670677260,},
+        regionOffset = {[1] = 1670338860 + 3600, [2] = 1670698860, [3] = 1674763260, [4] = 1670698860, [5] = 1670677260,},
         duration = 7200,
         interval = 18000,
         questIDs = {74378},
@@ -91,12 +61,7 @@ local events = {
     },
     [7] = {name = L["Elemental Storm"],
         icon = "ElementalStorm-Lesser-Earth",
-        regionOffset = {
-            [1] = 30,
-            [2] = 30,
-            [3] = 30,
-            [4] = 30,
-            [5] = 30,},
+        regionOffset = {[1] = 30, [2] = 30, [3] = 30, [4] = 30, [5] = 30,},
         duration = 7200,
         interval = 10800,
         questIDs = {},
@@ -106,12 +71,7 @@ local events = {
     },
     [8] ={name = L["Superbloom"],
         icon = "MajorFactions_MapIcons_Dream64",
-        regionOffset = {
-            [1] = 11,
-            [2] = 11,
-            [3] = 11,
-            [4] = 11,
-            [5] = 11,},
+        regionOffset = {[1] = 11, [2] = 11, [3] = 11, [4] = 11, [5] = 11,},
         duration = 1040,
         interval = 3600,
         questIDs = {78319},
@@ -119,12 +79,7 @@ local events = {
     },
     [9] = {name = L["The Big Dig"],
         icon = "interface/archeology/arch-icon-marker.blp",
-        regionOffset = {
-            [1] = 1836,
-            [2] = 1836,
-            [3] = 1836,
-            [4] = 1836,	
-            [5] = 1836,},
+        regionOffset = {[1] = 1836, [2] = 1836, [3] = 1836, [4] = 1836, [5] = 1836,},
         duration = 552,
         interval = 3600,
         questIDs = {79226},
@@ -214,6 +169,8 @@ for i = 1, 9 do
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT") --ANCHOR_CURSOR_RIGHT
         local status
         local iscompleted = nil
+
+        GameTooltip:SetText(string.format("|cff00ffff%s|r\n",self.tooltipTitle))
         if self.isEventActive then
             status = string.format("|cffffff00%s|r",L["Event_is_Active"]) --amarelo
         else
@@ -221,12 +178,9 @@ for i = 1, 9 do
         end
         iscompleted = IsQuestCompleted(self.questIDs)
         if iscompleted then
-            GameTooltip:SetText(string.format("|cff00ffff%s|r\n",self.tooltipTitle))
             CryslashEventsTrackerSaved[charName].events[i] = 1
             GameTooltip:AddLine(string.format("|cff00ff00%s|r",charName)) --verde
         else
-            --GameTooltip:SetText(string.format("%s\n\n |cff00ff00Disponível Nesse Char|r".."\n\n%s",self.tooltipTitle,status))
-            GameTooltip:SetText(string.format("|cff00ffff%s|r\n",self.tooltipTitle))
             CryslashEventsTrackerSaved[charName].events[i] = 0
             GameTooltip:AddLine(string.format("|cffff0000%s|r",charName)) --vermelho
         end
@@ -296,7 +250,7 @@ end
 
 function CEventsTracker_OnEvent(self, event, ...)
     if event == "ADDON_LOADED" and ... == "CrySlash_EventsTracker" then
-	    charName = UnitName("player") .. " - " .. GetRealmName();
+	    charName = string.format("%s - %s",UnitName("player"), GetRealmName());
 		if CryslashEventsTrackerSaved == nil then
             CryslashEventsTrackerSaved = {}
         end
