@@ -122,6 +122,19 @@ local function IsQuestCompleted(questIds)
     return (completed > 0)
 end
 
+local function ResetEventsWeekly(resettime)
+    if resettime < time() then
+        for _, charData in pairs(CryslashEventsTrackerSaved) do
+            if charData.events then
+                for i in ipairs(charData.events) do
+                    charData.events[i] = 0
+                end
+            end
+        end
+        print("|cffffff00Cryslash-EventsTracker:|r Os eventos foram resetados!!")
+    end
+end
+
 function CEventsTrack_Onload(self)
 UIPanelWindows["CEventsTracker"] = {
     area = "left",
@@ -130,6 +143,7 @@ UIPanelWindows["CEventsTracker"] = {
 }
 
 local serverResetTime = GetServerTime() - (604800 - C_DateAndTime.GetSecondsUntilWeeklyReset());
+local nextResetTime = GetServerTime() + C_DateAndTime.GetSecondsUntilWeeklyReset()
 local region = GetCurrentRegion();
 -- ptr
 if not region or region > 5 then
@@ -206,6 +220,7 @@ for i = 1, 9 do
 		if self.elapsed < 1 then return end
 		self.elapsed = 0;
 	end
+    ResetEventsWeekly(nextResetTime)
     if not self:IsShown() then return end
         local timeFromFirstStart = GetServerTime() - self.eventNewRegionOffset;
         local timeToNextEvent = (events[i].interval - timeFromFirstStart % events[i].interval) + (self.timeTmp and self.timeTmp or 0);
