@@ -1,7 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
 
 <!--Events Templates-->
-<Frame name="CryslashEventsTrackerTemplate" virtual="true">
+<Button name="CryslashEventsTrackerTemplate" registerForClicks="LeftButtonUp,RightButtonUp" virtual="true">
    <Size x="100" y="100" />
    <Layers>
       <Layer level="BACKGROUND">
@@ -41,12 +41,13 @@
       </Layer>
    </Layers>
 <Scripts>
-   <OnEnter>
+   <OnLeave>
+      GameTooltip:Hide()
       <!-- print("mouse has entered", self:GetName()) -->
       <!-- ShowEventTooltip(self.tooltipTitle, self.isEventActive) -->
-   </OnEnter>
+   </OnLeave>
 </Scripts>
-</Frame>
+</Button>
 
 <!-- Main Frame-->
 <Frame name="CEventsTracker" parent="UIParent" hidden="true">
@@ -66,6 +67,34 @@
                </Anchor>
             </Anchors>
          </FontString>
+         <!-- <Texture parentkey="mouseIcon" atlas = "NPE_LeftClick">
+         <Size x="24" y="24"/>
+            <Anchors>
+               <Anchor point="BOTTOM">
+                  <Offset x="0" y="55" />
+               </Anchor>
+            </Anchors>
+         </Texture>
+         <FontString name="$parent_Feet" parentKey="feet" inherits="GameFontNormal" Text="|cff00ff80marcar ponto|r">
+            <Anchors>
+               <Anchor point="BOTTOM" relativeKey="$parent" relativePoint="BOTTOM" x="54" y="62" />
+            </Anchors>
+         </FontString>
+
+         <Texture parentkey="mouseIcon" atlas = "NPE_LeftClick">
+         <Size x="24" y="24"/>
+            <Anchors>
+               <Anchor point="BOTTOM">
+                  <Offset x="120" y="55" />
+               </Anchor>
+            </Anchors>
+         </Texture>
+         <FontString name="$parent_Feet" parentKey="feet" inherits="GameFontNormal" Text="|cff00ff80+SHIFT - abrir mapa|r">
+            <Anchors>
+               <Anchor point="BOTTOM" relativeKey="$parent" relativePoint="BOTTOM" x="187" y="62" />
+            </Anchors>
+         </FontString> -->
+
       </Layer>
    </Layers>   
       <Frames>

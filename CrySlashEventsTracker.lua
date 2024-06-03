@@ -1,7 +1,4 @@
---local playername = UnitName("player");
---message("Hello " .. playername);
 local _, L = ...
---CryslashEventsTrackerSaved = CryslashEventsTrackerSaved or {}
 local charName
 
 SLASH_CEVENTSTRACKER1 = "/cet"
@@ -87,13 +84,6 @@ local events = {
     }
 }
 
-function MakeMovable(frame)
-    frame:SetMovable(true)
-    frame:RegisterForDrag("LeftButton")
-    frame:SetScript("OnDragStart", frame.StartMoving)
-    frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
-end
-
 local function SecondsToEventTime(seconds)
 	local units = ConvertSecondsToUnits(seconds);
 	if units.hours > 0 then
@@ -122,7 +112,11 @@ local function IsQuestCompleted(questIds)
     return (completed > 0)
 end
 
-local function ResetEventsWeekly(resettime)
+local function isBlp(str)
+    return str:sub(-4) ==".blp"
+end
+
+local function WeeklyResetEvents(resettime)
     if resettime < time() then
         for _, charData in pairs(CryslashEventsTrackerSaved) do
             if charData.events then
@@ -133,6 +127,40 @@ local function ResetEventsWeekly(resettime)
         end
         print("|cffffff00Cryslash-EventsTracker:|r Os eventos foram resetados!!")
     end
+end
+
+local function SearchEventsOnMaps(i)
+    local eventName = events[i].name
+    local lookingForMaps = events[i].findEventOnMap
+    local changedName,atlasName, x, y, findMapID
+    local toolTip = ""
+
+    for _, mapID in next, lookingForMaps do
+        local areaPoiIDs = C_AreaPoiInfo.GetAreaPOIForMap(mapID)
+        for _, ids in pairs(areaPoiIDs) do
+            local poiInfo = C_AreaPoiInfo.GetAreaPOIInfo(mapID, ids)
+            if poiInfo.isPrimaryMapForPOI and
+            ((eventName == L["Dreamsurge"] and poiInfo.atlasName == "dreamsurge_hub-icon") or (eventName == L["Elemental Storm"] and string.find(poiInfo.atlasName, "ElementalStorm"))) then
+                atlasName = poiInfo.atlasName
+                local mapName = C_Map.GetMapInfo(mapID).name or UNKNOWN
+                if atlasName == "ElementalStorm-Lesser-Water" then
+                    changedName = L["Snowstorms"]
+                elseif atlasName == "ElementalStorm-Lesser-Fire" then
+                    changedName = L["Firestorms"]
+                elseif atlasName == "ElementalStorm-Lesser-Air" then
+                    changedName = L["Thunderstorms"]
+                elseif atlasName == "ElementalStorm-Lesser-Earth" then
+                    changedName = L["Sandstorms"]
+                end
+                toolTip = toolTip.."|A:"..atlasName..":24:24|a".." "..(changedName and changedName or eventName).." "..L["in"].." "..mapName.."\n"
+                findMapID = mapID;
+                x, y = poiInfo.position:GetXY();
+            end
+        end
+    end
+    if findMapID then
+		return findMapID, x*100, y*100, atlasName, toolTip
+	end
 end
 
 function CEventsTrack_Onload(self)
@@ -152,39 +180,64 @@ end
 
 self.frames = {}
 for i = 1, 9 do
-    local frame = CreateFrame("Frame", "Event"..i, self, "CryslashEventsTrackerTemplate")   -- UIPanelScrollFrameTemplate CryslashEventsTrackerTemplate
-    
+    --Creating template frames
+    local frame = CreateFrame("Button", "Event"..i, self, "CryslashEventsTrackerTemplate")   -- UIPanelScrollFrameTemplate CryslashEventsTrackerTemplate
+
+    --Anchoring frames
     self.frames[i] = frame
     if i == 1 then
         frame:SetPoint("TOPLEFT", self, "TOPLEFT", 35, -95)
     elseif i == 6 then
         frame:SetPoint("TOPLEFT", self.frames[1], "BOTTOMLEFT", 0, -10)
-    elseif i == 11 then 
-        frame:SetPoint("TOPLEFT", self.frames[i-5],"BOTTOMLEFT", 0, 0)    
+    elseif i == 11 then
+        frame:SetPoint("TOPLEFT", self.frames[i-5],"BOTTOMLEFT", 0, 0)
     else
         frame:SetPoint("TOPLEFT", self.frames[i-1], "TOPRIGHT", 12, 0)
     end
-    frame.icon:SetTexture(events[i]["icon"])
-    frame.icon:SetAtlas(events[i]["icon"])
+
+    --Seting frames variables
+    -- local mapId, coorX, coorY, atlasName, tooltip
+    -- if events[i].findEventOnMap then
+    --     mapId, coorX, coorY, atlasName, tooltip =  SearchEventsOnMaps(i)
+    --     local gps ={mapId, coorX, coorY}
+    --     frame.gps = gps
+    -- else
+    --     frame.gps = events[i].gps
+    -- end
+    local mapId, coorX, coorY, atlasName, tooltip
+
+    -- if atlasName then
+    --     frame.icon:SetTexture(atlasName)
+    --     frame.icon:SetAtlas(atlasName)
+
+    --else
+        frame.icon:SetTexture(events[i]["icon"])
+        frame.icon:SetAtlas(events[i]["icon"])
+    --end
     frame.tooltipTitle = events[i].name
     frame.questIDs = events[i].questIDs
-
     frame.initComplete = false
     frame.notification = false
     frame.isEventActive = nil
     frame.timeTmp = nil
     frame.eventNewRegionOffset = events[i].regionOffset [region] > 1600000000 and events[i].regionOffset [region] or (serverResetTime + events[i].regionOffset [region]);
     
-    --_G["CryslashEventsTrackerSaved"][UnitName("player")].events[i].iscompleted = 1
-    --print(charName)
-    --print(CryslashEventsTrackerSaved[UnitName("player") .. " - " .. GetRealmName()])
 
+    --Setting Scripts Events
     frame:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT") --ANCHOR_CURSOR_RIGHT
         local status
         local iscompleted = nil
-
-        GameTooltip:SetText(string.format("|cff00ffff%s|r\n",self.tooltipTitle))
+        
+        if tooltip then
+           GameTooltip:SetText(string.format("|cffffffff%s|r",tooltip))
+        else
+            if isBlp(events[i]["icon"]) then
+                GameTooltip:SetText(CreateTextureMarkup(events[i]["icon"], 24, 24, 24, 24, 1, 0, 1, 0)..string.format("|cffffffff %s|r\n",self.tooltipTitle))
+            else
+                GameTooltip:SetText(CreateAtlasMarkup(events[i]["icon"], 24, 24)..string.format("|cffffffff %s|r\n",self.tooltipTitle))  --|cff00ffff
+            end
+        end
         if self.isEventActive then
             status = string.format("|cffffff00%s|r",L["Event_is_Active"]) --amarelo
         else
@@ -208,8 +261,9 @@ for i = 1, 9 do
                 end
             end
         end
-        
+
         GameTooltip:AddLine("\n"..status)
+        GameTooltip:AddDoubleLine("\n"..CreateAtlasMarkup("NPE_LeftClick",18,18)..L["Way_Point"],"\n"..CreateAtlasMarkup("NPE_RightClick",18,18)..L["Show_in_Map"],0,1,0.5,0,1,0.5)
         GameTooltip:Show()
         ShowUIPanel(GameTooltip)
     end)
@@ -220,14 +274,26 @@ for i = 1, 9 do
 		if self.elapsed < 1 then return end
 		self.elapsed = 0;
 	end
-    ResetEventsWeekly(nextResetTime)
+    WeeklyResetEvents(nextResetTime)
+    --local mapId, coorX, coorY, atlasName, tooltip
+    if events[i].findEventOnMap then
+        mapId, coorX, coorY, atlasName, tooltip =  SearchEventsOnMaps(i)
+        local gps ={mapId, coorX, coorY}
+        frame.gps = gps
+    else
+        frame.gps = events[i].gps
+    end
+    if atlasName then
+        frame.icon:SetTexture(atlasName)
+        frame.icon:SetAtlas(atlasName)
+    end
     if not self:IsShown() then return end
         local timeFromFirstStart = GetServerTime() - self.eventNewRegionOffset;
         local timeToNextEvent = (events[i].interval - timeFromFirstStart % events[i].interval) + (self.timeTmp and self.timeTmp or 0);
         local timeActiveEvent = self.timeTmp and timeToNextEvent or events[i].duration - (events[i].interval - timeToNextEvent);
         local isEventActive = (events[i].interval + (self.timeTmp and self.timeTmp or 0)) - timeToNextEvent <= events[i].duration;
         local showedTime = isEventActive and timeActiveEvent or timeToNextEvent;
-     
+
         if not self.initComplete or (self.isEventActive and not isEventActive) then
             if (self.isEventActive and not isEventActive) then self.isEventActive = false end
             self.timer:SetTextColor(.9, .9, .9); --(.9, .9, .9)  branco
@@ -236,18 +302,15 @@ for i = 1, 9 do
         if not self.isEventActive and isEventActive then
             if self.timeTmp and self.timeTmp > 0 then
                 self.timeTmp = self.timeTmp - events[i].interval;
-                --self.timer:SetTextColor(0, 1, 0);  --(0, 1, 0) verde
                 self.timer:SetTextColor(1, 1, 0);
                 if self.anim and not self.icon.Anim:IsPlaying() then
                     self.icon.Anim:Play();
                 end
             end
             if self.initComplete then
-               --C_VoiceChat.SpeakText(0, events[i].name.." iniciou.", 1, 0, 50);
                PlaySound(32585, "Master");
             end
             self.isEventActive = true;
-            --self.timer:SetTextColor(0, 1, 0);  --(0, 1, 0) verde
             self.timer:SetTextColor(1, 1, 0);
             if self.anim and not self.icon.Anim:IsPlaying() then
                 self.icon.Anim:Play();
@@ -257,10 +320,23 @@ for i = 1, 9 do
         self.initComplete = true
     end)
 
+    frame:SetScript("OnClick", function(self, button)
+        --if button == "LeftButton" and next(self.gps) then
+        if next(self.gps) then
+            C_Map.ClearUserWaypoint()
+            C_Map.SetUserWaypoint(UiMapPoint.CreateFromCoordinates(self.gps[1], self.gps[2]/100, self.gps[3]/100, 0))
+            C_SuperTrack.SetSuperTrackedUserWaypoint(true)
+        end
+        --if IsModifierKeyDown() then
+        if button =="RightButton" and next(self.gps) then
+            ToggleWorldMap();
+			if WorldMapFrame:IsVisible() then
+				WorldMapFrame:SetMapID(self.gps[1]);
+			end;
+        end
+    end)
 end
-
     self:RegisterEvent("ADDON_LOADED", CEventsTracker_OnEvent)
-    MakeMovable(CEventsTracker)
 end
 
 function CEventsTracker_OnEvent(self, event, ...)
@@ -274,10 +350,8 @@ function CEventsTracker_OnEvent(self, event, ...)
 			CryslashEventsTrackerSaved[charName].class = select(2, UnitClass("player"))
 			CryslashEventsTrackerSaved[charName].events = {}
 		end    
-    elseif event == "PLAYER_LOGOUT" then    
-    
-        
-        
+    elseif event == "PLAYER_LOGOUT" then
+
     elseif event == "PLAYER_ENTERING_WORLD" then
         CryslashEventsTrackerSaved = CryslashEventsTrackerSaved or 0
     end
