@@ -2,7 +2,7 @@
 ## Title: |cff00ccffCryslash|r EventsTracker
 ## Author: Cryslash
 ## Notes: Acompanhe os eventos pelo mapa de DragonFlight.
-## SavedVariables: CryslashEventsTrackerSaved
+## SavedVariables: CryslashEventsTrackerSaved, CryslashEventsTrackerSavedSettings
 ## Version: 0.1
 
 Locale\Locale.xml

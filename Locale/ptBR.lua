@@ -8,6 +8,7 @@ L["Events Tracker"] = "Rastreador de Eventos"
 -- events name
 L["Community feast"] = "Banquete Comunitário"
 L["Researchers under fire"] = "Pesquisadores Sob Fogo"
+L["Grand Hunt"] = "Grandes Caçadas"
 L["Dragonbane Keep"] = "Ataque a Bastilha do Dragão"
 L["Time rift"] = "Fenda Temporal"
 L["Dreamsurge"] = "Surto Onírico"
@@ -21,6 +22,7 @@ L["Superbloom"] = "Superflorada"
 L["The Big Dig"] = "A Grande Escavação"
 
 -- others
+L["Grand Hunt Party"] = "Grande Grupo de Caça"
 L["Event_is_Active"] = "O evento está ativo"
 L["Event_is_Waiting"] = "Evento em espera"
 L["Speak volume:"] = "Speak volume:"

@@ -8,6 +8,7 @@ L["Events Tracker"] = "Events Tracker"
 -- events name
 L["Community feast"] = "Community feast"
 L["Researchers under fire"] = "Researchers under fire"
+L["Grand Hunt"] = "Grand Hunts"
 L["Dragonbane Keep"] = "Dragonbane Keep"
 L["Time rift"] = "Time rift"
 L["Dreamsurge"] = "Dreamsurge"
